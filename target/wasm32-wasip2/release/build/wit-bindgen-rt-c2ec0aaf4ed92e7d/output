@@ -1,2 +1,0 @@
-cargo:rustc-link-lib=static=wit_bindgen_cabi_realloc0_41_0
-cargo:rustc-link-search=native=D:\code\zed-intellij-extension\target\wasm32-wasip2\release\build\wit-bindgen-rt-c2ec0aaf4ed92e7d\out

@@ -1,2 +1,0 @@
-cargo:rerun-if-changed=build.rs
-cargo:rustc-env=DEBUG_OUTPUT_DIR=D:\code\zed-intellij-extension\target\release\build\wit-bindgen-rust-macro-86d055ace6eb5e17\out
