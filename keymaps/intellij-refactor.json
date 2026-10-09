@@ -1,0 +1,64 @@
+[
+  // IntelliJ IDEA refactoring keybindings for Zed (Windows/Linux)
+  // These complement the JetBrains base_keymap with refactoring-focused shortcuts
+
+  {
+    "context": "Editor && extension == java || Editor && extension == kt",
+    "bindings": {
+      // Alt+Enter — Show code actions (quick fixes, inspections)
+      "alt-enter": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+L — Reformat code
+      "ctrl-alt-l": "editor::Format",
+
+      // Ctrl+Alt+O — Optimize imports
+      "ctrl-alt-o": "editor::OrganizeImports",
+
+      // Shift+F6 — Rename symbol
+      "shift-f6": "editor::Rename",
+
+      // Ctrl+Alt+Shift+T — Show refactor menu (opens code actions filtered to refactorings)
+      "ctrl-alt-shift-t": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+V — Extract variable (code action)
+      "ctrl-alt-v": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+M — Extract method (code action)
+      "ctrl-alt-m": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+F — Extract field (code action)
+      "ctrl-alt-f": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+C — Extract constant (code action)
+      "ctrl-alt-c": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+P — Extract parameter (code action)
+      "ctrl-alt-p": "editor::ShowCodeActions",
+
+      // F6 — Move refactoring (code action)
+      "f6": "editor::ShowCodeActions",
+
+      // Ctrl+I — Implement methods / Override methods (code action)
+      "ctrl-i": "editor::ShowCodeActions",
+
+      // Ctrl+Alt+T — Surround with (code action)
+      "ctrl-alt-t": "editor::ShowCodeActions",
+
+      // Ctrl+P — Parameter info
+      "ctrl-p": "editor::ShowSignatureHelp",
+
+      // Ctrl+Q — Quick documentation
+      "ctrl-q": "editor::Hover",
+
+      // Ctrl+B / Ctrl+Click — Go to declaration
+      "ctrl-b": "editor::GoToDefinition",
+      "ctrl-alt-b": "editor::GoToImplementation",
+
+      // Ctrl+Shift+B — Go to type declaration
+      "ctrl-shift-b": "editor::GoToTypeDefinition",
+
+      // Alt+F7 — Find usages
+      "alt-f7": "editor::FindAllReferences"
+    }
+  }
+]
