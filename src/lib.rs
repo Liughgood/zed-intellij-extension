@@ -7,18 +7,33 @@ struct IntelliJServerExtension;
 
 impl IntelliJServerExtension {
     fn server_binary_path(&self, language_server_id: &LanguageServerId, worktree: &zed::Worktree) -> Result<String> {
+        // First check initialization_options.serverPath
+        if let Some(settings) = LspSettings::for_worktree(language_server_id.as_ref(), worktree).ok() {
+            if let Some(opts) = &settings.initialization_options {
+                if let Some(path) = opts.get("serverPath").and_then(|v| v.as_str()) {
+                    if !path.is_empty() {
+                        return Ok(path.to_string());
+                    }
+                }
+            }
+        }
+
+        // Fallback: check binary.path
         if let Some(binary) = LspSettings::for_worktree(language_server_id.as_ref(), worktree)
             .ok()
             .and_then(|s| s.binary)
         {
             if let Some(path) = binary.path {
-                return Ok(path);
+                if !path.is_empty() {
+                    return Ok(path);
+                }
             }
         }
-        Err("intellij-server binary path not configured. Please set `lsp.intellij-server-java.binary.path` in your Zed settings to point to intellij-server.exe")?
+
+        Err("intellij-server binary path not configured. Please set `initialization_options.serverPath` in your Zed settings")?
     }
 
-    fn system_path_args(&self, language_server_id: &LanguageServerId, worktree: &zed::Worktree) -> Vec<String> {
+    fn server_args(&self, language_server_id: &LanguageServerId, worktree: &zed::Worktree) -> Vec<String> {
         let mut args = vec!["--stdio".to_string(), "--system-path".to_string()];
 
         if let Some(settings) = LspSettings::for_worktree(language_server_id.as_ref(), worktree).ok() {
@@ -48,7 +63,7 @@ impl zed::Extension for IntelliJServerExtension {
         match language_server_id.as_ref() {
             "intellij-server-java" | "intellij-server-kotlin" => {
                 let binary_path = self.server_binary_path(language_server_id, worktree)?;
-                let args = self.system_path_args(language_server_id, worktree);
+                let args = self.server_args(language_server_id, worktree);
                 Ok(zed::Command {
                     command: binary_path,
                     args,
