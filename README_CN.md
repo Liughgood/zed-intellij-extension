@@ -1,5 +1,7 @@
 # IntelliJ Server — Zed Extension (Unofficial)
 
+**[English](README.md)**
+
 将 JetBrains 的 **IntelliJ Server**（来自 VS Code 扩展 "Java and Kotlin by IntelliJ IDEA"）作为 LSP Server 接入 Zed 编辑器，提供 IntelliJ 级别的 Java 和 Kotlin 语言支持。
 
 > **⚠️ 本项目为非官方社区项目，与 JetBrains 无任何关联。** "IntelliJ" 是 JetBrains s.r.o. 的注册商标。本扩展不包含、不分发任何 JetBrains 专有软件，用户需自行从 JetBrains 官方渠道获取 IntelliJ Server。
