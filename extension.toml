@@ -1,9 +1,9 @@
 id = "intellij-server"
-name = "IntelliJ Server"
+name = "IntelliJ Server (Unofficial)"
 version = "0.1.0"
 schema_version = 1
-authors = ["local"]
-description = "IntelliJ-powered Java and Kotlin language server for Zed"
+authors = ["community"]
+description = "Unofficial Zed extension to use JetBrains IntelliJ Server as Java/Kotlin LSP"
 repository = ""
 
 [language_servers.intellij-server-java]
