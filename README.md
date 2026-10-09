@@ -72,122 +72,23 @@ rustup default stable-x86_64-pc-windows-gnu
 rustup target add wasm32-wasip2
 ```
 
-### 4. 创建 Zed 扩展
+### 4. 安装 Zed 扩展
 
-Zed 的 `lsp` 配置只允许已注册的扩展名称，不能随意添加自定义 language server。因此需要创建一个 Zed 扩展来注册 `intellij-server`。
-
-#### 目录结构
-
-```
-zed-intellij-extension/
-  extension.toml       # 扩展清单
-  Cargo.toml           # Rust 项目配置
-  src/
-    lib.rs             # 扩展逻辑
-  rust-toolchain.toml  # 强制使用 GNU 工具链
-```
-
-#### extension.toml
-
-```toml
-id = "intellij-server"
-name = "IntelliJ Server"
-version = "0.1.0"
-schema_version = 1
-authors = ["local"]
-description = "IntelliJ-powered Java and Kotlin language server for Zed"
-repository = ""
-
-[language_servers.intellij-server-java]
-name = "IntelliJ Server (Java)"
-language = "Java"
-
-[language_servers.intellij-server-kotlin]
-name = "IntelliJ Server (Kotlin)"
-language = "Kotlin"
-```
-
-> **注意**：不要添加 `[grammars.*]` 部分，Java 和 Kotlin 的 Tree-sitter 语法 Zed 已内置，重复定义会导致安装失败。
-
-#### Cargo.toml
-
-```toml
-[package]
-name = "zed_intellij_server"
-version = "0.1.0"
-edition = "2021"
-publish = false
-
-[lib]
-path = "src/lib.rs"
-crate-type = ["cdylib"]
-
-[dependencies]
-zed_extension_api = "0.5.0"
-```
-
-#### src/lib.rs
-
-```rust
-use zed_extension_api::{self as zed, LanguageServerId, Result};
-
-const SERVER_PATH: &str = "D:/code/vscode-jetbrain/jetbrains.intellij-server-0.0.13-win32-x64/extension/server/bin/intellij-server.exe";
-const SYSTEM_PATH: &str = "C:/Users/admin/.intellij-server/system";
-
-struct IntelliJServerExtension;
-
-impl zed::Extension for IntelliJServerExtension {
-    fn new() -> Self {
-        Self
-    }
-
-    fn language_server_command(
-        &mut self,
-        language_server_id: &LanguageServerId,
-        _: &zed::Worktree,
-    ) -> Result<zed::Command> {
-        match language_server_id.as_ref() {
-            "intellij-server-java" | "intellij-server-kotlin" => Ok(zed::Command {
-                command: SERVER_PATH.to_string(),
-                args: vec![
-                    "--stdio".to_string(),
-                    "--system-path".to_string(),
-                    SYSTEM_PATH.to_string(),
-                ],
-                env: Default::default(),
-            }),
-            _ => Err(format!(
-                "Unrecognized language server: {language_server_id}"
-            ))?,
-        }
-    }
-}
-
-zed::register_extension!(IntelliJServerExtension);
-```
-
-#### rust-toolchain.toml（无 Visual Studio 时必需）
-
-```toml
-[toolchain]
-channel = "stable-x86_64-pc-windows-gnu"
-targets = ["wasm32-wasip2"]
-```
-
-### 5. 初始化 Git 仓库
-
-Zed 扩展必须是 Git 仓库：
+扩展代码位于本仓库中。从包含 Rust PATH 的环境启动 Zed：
 
 ```powershell
-cd D:\code\zed-intellij-extension
-git init
-git add -A
-git commit -m "Initial commit"
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
+Start-Process "path/to/Zed.exe"
 ```
 
-### 6. 配置 Zed settings.json
+在 Zed 中：
+1. `Ctrl+Shift+P` → 搜索 `install dev extension`
+2. 选择本仓库目录
+3. 等待编译完成
 
-编辑 `C:\Users\admin\AppData\Roaming\Zed\settings.json`，添加 `languages` 配置让 Java/Kotlin 优先使用 IntelliJ Server：
+### 5. 配置 Zed settings.json
+
+编辑 `C:\Users\admin\AppData\Roaming\Zed\settings.json`：
 
 ```json
 {
@@ -198,36 +99,39 @@ git commit -m "Initial commit"
     "Kotlin": {
       "language_servers": ["intellij-server-kotlin", "!kotlin-lsp", "!kotlin-language-server", "..."]
     }
+  },
+  "lsp": {
+    "intellij-server-java": {
+      "binary": {
+        "path": "/path/to/intellij-server.exe"
+      },
+      "initialization_options": {
+        "systemPath": "/path/to/intellij-server-system-dir"
+      }
+    },
+    "intellij-server-kotlin": {
+      "binary": {
+        "path": "/path/to/intellij-server.exe"
+      },
+      "initialization_options": {
+        "systemPath": "/path/to/intellij-server-system-dir"
+      }
+    }
   }
 }
 ```
 
+**必填配置项**：
+
+| 配置项 | 说明 |
+|--------|------|
+| `binary.path` | `intellij-server.exe` 的完整路径 |
+| `initialization_options.systemPath` | 缓存/索引目录路径（服务器会在此目录下创建 config/system 子目录） |
+
 - `!jdtls` — 禁用默认的 Eclipse JDTLS
 - `!kotlin-lsp` / `!kotlin-language-server` — 禁用默认的 Kotlin LSP
 - `...` — 保留其他语言服务器（如 formatter）
-
-### 7. 安装扩展
-
-**关键**：必须从包含 Rust PATH 的环境中启动 Zed，否则 Zed 找不到 `rustc`：
-
-```powershell
-# 确保 Rust 在 PATH 中
-$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
-
-# 启动 Zed
-Start-Process "D:\app\Zed\bin\Zed.exe"
-```
-
-在 Zed 中：
-1. `Ctrl+Shift+P` → 搜索 `install dev extension`
-2. 选择 `D:\code\zed-intellij-extension` 目录
-3. 等待编译完成（首次约 30 秒）
-
-安装成功后日志会显示：
-```
-compiled Rust extension "D:\\code\\zed-intellij-extension"
-extensions updated. loading 0, reloading 1, unloading 0
-```
+- 如果未配置 `binary.path`，扩展会报错提示用户配置
 
 ## 验证
 
@@ -240,7 +144,7 @@ extensions updated. loading 0, reloading 1, unloading 0
 
 查看日志确认服务器已启动：
 ```
-Log file: C:\Users\admin\.intellij-server\system\system\log\intellij-server.log
+Log file: <systemPath>/system/log/intellij-server.log
 ```
 
 ## IntelliJ Server 支持的功能
@@ -252,6 +156,20 @@ Log file: C:\Users\admin\.intellij-server\system\system\log\intellij-server.log
 | 插件 | Spring/Spring Boot, Lombok, JUnit, TestNG, EditorConfig |
 | 调试 | DAP (JVM Debug Adapter Protocol) |
 | 其他 | 代码补全、导航、诊断、快速修复、重构、格式化 |
+
+## 扩展架构
+
+```
+zed-intellij-extension/
+  extension.toml           # 注册 intellij-server-java 和 intellij-server-kotlin
+  Cargo.toml               # Rust 项目配置
+  src/
+    lib.rs                  # 从 Zed settings 读取 binary.path 和 systemPath，
+                            # 启动 intellij-server.exe --stdio --system-path <path>
+  rust-toolchain.toml      # GNU 工具链配置（无 Visual Studio 时必需）
+```
+
+扩展本身不包含 IntelliJ Server 二进制文件，用户需自行下载 VS Code 扩展获取。
 
 ## 踩坑记录
 
