@@ -6,9 +6,21 @@ authors = ["local"]
 description = "IntelliJ-powered Java and Kotlin language server for Zed"
 repository = ""
 
-[language_servers.intellij-server]
-name = "IntelliJ Server"
+[language_servers.intellij-server-java]
+name = "IntelliJ Server (Java)"
 language = "Java"
+
+[language_servers.intellij-server-kotlin]
+name = "IntelliJ Server (Kotlin)"
+language = "Kotlin"
+
+[grammars.java]
+repository = "https://github.com/tree-sitter/tree-sitter-java"
+commit = "09d650def6cdf7f479f4b78f595e9ef5b3ce31f5"
+
+[grammars.kotlin]
+repository = "https://github.com/fwcd/tree-sitter-kotlin"
+commit = "1852ea17b7f60fb3f9d84e0b1555d56b46b39fb1"
 
 [grammars.java]
 repository = "https://github.com/tree-sitter/tree-sitter-java"

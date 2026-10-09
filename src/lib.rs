@@ -16,7 +16,7 @@ impl zed::Extension for IntelliJServerExtension {
         _: &zed::Worktree,
     ) -> Result<zed::Command> {
         match language_server_id.as_ref() {
-            "intellij-server" => Ok(zed::Command {
+            "intellij-server-java" | "intellij-server-kotlin" => Ok(zed::Command {
                 command: SERVER_PATH.to_string(),
                 args: vec![
                     "--stdio".to_string(),
